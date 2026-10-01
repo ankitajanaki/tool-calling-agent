@@ -8,6 +8,13 @@ import requests
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 
+def search_closet():
+    """
+    Looks through items already in your closet.
+    Attempts to apply filters based on provided details and occassion.
+    """
+    
+
 
 def get_weather(location: str) -> str:
     """Get the current weather for a location."""
