@@ -1,0 +1,462 @@
+[
+    {
+        "id": 1,
+        "name": "White cotton button-down shirt",
+        "category": "tops",
+        "color": "white",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "classic",
+            "layering"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Black fitted crew-neck t-shirt",
+        "category": "tops",
+        "color": "black",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "casual",
+            "basic",
+            "layering"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Striped Breton long-sleeve top",
+        "category": "tops",
+        "color": "navy",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "casual",
+            "classic",
+            "french"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Cream cable-knit sweater",
+        "category": "tops",
+        "color": "cream",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "casual",
+            "cozy"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Emerald silk balloon sleeve blouse",
+        "category": "tops",
+        "color": "green",
+        "season": [
+            "spring",
+            "summer"
+        ],
+        "tags": [
+            "evening",
+            "formal"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Grey merino turtleneck",
+        "category": "tops",
+        "color": "grey",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "minimal",
+            "layering"
+        ]
+    },
+    {
+        "id": 7,
+        "name": "Linen oversized shirt",
+        "category": "tops",
+        "color": "beige",
+        "season": [
+            "summer"
+        ],
+        "tags": [
+            "casual",
+            "vacation",
+            "relaxed"
+        ]
+    },
+    {
+        "id": 8,
+        "name": "High-rise straight-leg jeans",
+        "category": "bottoms",
+        "color": "blue",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "casual",
+            "denim",
+            "basic"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "Black tailored trousers",
+        "category": "bottoms",
+        "color": "black",
+        "season": [
+            "spring",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "formal",
+            "minimal"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "Camel wide-leg pants",
+        "category": "bottoms",
+        "color": "camel",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "polished"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "Pleated midi skirt",
+        "category": "bottoms",
+        "color": "olive",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "work"
+        ]
+    },
+    {
+        "id": 12,
+        "name": "Denim cutoff shorts",
+        "category": "bottoms",
+        "color": "blue",
+        "season": [
+            "summer"
+        ],
+        "tags": [
+            "casual",
+            "vacation",
+            "denim"
+        ]
+    },
+    {
+        "id": 13,
+        "name": "Black dress",
+        "category": "dresses",
+        "color": "black",
+        "season": [
+            "spring",
+            "summer",
+            "fall"
+        ],
+        "tags": [
+            "evening",
+            "classic"
+        ]
+    },
+    {
+        "id": 14,
+        "name": "Floral wrap midi dress",
+        "category": "dresses",
+        "color": "pink",
+        "season": [
+            "spring",
+            "summer"
+        ],
+        "tags": [
+            "brunch",
+            "wedding-guest"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "Navy knit sweater dress",
+        "category": "dresses",
+        "color": "navy",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "cozy"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "Black wool blazer",
+        "category": "outerwear",
+        "color": "black",
+        "season": [
+            "spring",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "formal",
+            "layering"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "Camel wool coat",
+        "category": "outerwear",
+        "color": "camel",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "classic",
+            "polished"
+        ]
+    },
+    {
+        "id": 18,
+        "name": "Light-wash denim jacket",
+        "category": "outerwear",
+        "color": "blue",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "casual",
+            "denim",
+            "layering"
+        ]
+    },
+    {
+        "id": 19,
+        "name": "Black leather moto jacket",
+        "category": "outerwear",
+        "color": "black",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "edgy",
+            "evening",
+            "casual"
+        ]
+    },
+    {
+        "id": 20,
+        "name": "Beige trench coat",
+        "category": "outerwear",
+        "color": "beige",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "classic",
+            "work",
+            "rain"
+        ]
+    },
+    {
+        "id": 21,
+        "name": "White leather sneakers",
+        "category": "shoes",
+        "color": "white",
+        "season": [
+            "spring",
+            "summer",
+            "fall"
+        ],
+        "tags": [
+            "casual",
+            "basic",
+            "comfortable"
+        ]
+    },
+    {
+        "id": 22,
+        "name": "Black ankle boots",
+        "category": "shoes",
+        "color": "black",
+        "season": [
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "casual",
+            "work"
+        ]
+    },
+    {
+        "id": 23,
+        "name": "Nude block-heel pumps",
+        "category": "shoes",
+        "color": "beige",
+        "season": [
+            "spring",
+            "summer",
+            "fall"
+        ],
+        "tags": [
+            "work",
+            "formal",
+            "wedding-guest"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "Tan leather sandals",
+        "category": "shoes",
+        "color": "tan",
+        "season": [
+            "summer"
+        ],
+        "tags": [
+            "casual",
+            "vacation"
+        ]
+    },
+    {
+        "id": 25,
+        "name": "Brown suede loafers",
+        "category": "shoes",
+        "color": "brown",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "work",
+            "comfortable"
+        ]
+    },
+    {
+        "id": 26,
+        "name": "Black leather tote bag",
+        "category": "bags",
+        "color": "black",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "work",
+            "classic"
+        ]
+    },
+    {
+        "id": 27,
+        "name": "Woven straw crossbody bag",
+        "category": "bags",
+        "color": "tan",
+        "season": [
+            "summer"
+        ],
+        "tags": [
+            "vacation",
+            "casual"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "Gold hoop earrings",
+        "category": "jewelry",
+        "color": "gold",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "everyday",
+            "classic"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "Silk printed scarf",
+        "category": "accessories",
+        "color": "red",
+        "season": [
+            "spring",
+            "fall"
+        ],
+        "tags": [
+            "polished",
+            "statement"
+        ]
+    },
+    {
+        "id": 30,
+        "name": "Brown leather belt",
+        "category": "accessories",
+        "color": "brown",
+        "season": [
+            "spring",
+            "summer",
+            "fall",
+            "winter"
+        ],
+        "tags": [
+            "basic",
+            "work",
+            "casual"
+        ]
+    },
+    {
+        "id": 31,
+        "name": "Green linen shirt",
+        "category": "tops",
+        "color": "green",
+        "season": [
+            "summer"
+        ],
+        "tags": [
+            "casual",
+            "vacation"
+        ]
+    }
+]
