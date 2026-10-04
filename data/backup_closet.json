@@ -445,18 +445,5 @@
             "work",
             "casual"
         ]
-    },
-    {
-        "id": 31,
-        "name": "Green linen shirt",
-        "category": "tops",
-        "color": "green",
-        "season": [
-            "summer"
-        ],
-        "tags": [
-            "casual",
-            "vacation"
-        ]
     }
 ]
