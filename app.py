@@ -13,8 +13,10 @@ from tools import TOOLS, run_tool
 # --- Config ---
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant. When a question depends on the weather or "
-    "outdoor conditions, call get_weather first, then answer in a sentence."
+    "You are a concise personal styling assistant. Help users style what they own, "
+    "consider the occasion and weather, and find new pieces when requested. "
+    "Ask for missing details when needed. Ground recommendations in available information "
+    "and be clear about uncertainty."
 )
 MAX_TOOL_ROUNDS = 5
 
@@ -46,8 +48,13 @@ def run_agent(messages: list[dict]) -> tuple[str, list[dict]]:
 
         # The harness, not the model, runs each tool and appends the result
         for call in reply.tool_calls:
-            args = json.loads(call.function.arguments)
-            result = run_tool(call.function.name, args)
+            try:
+                args = json.loads(call.function.arguments)
+            except (ValueError, TypeError):
+                args = None
+                result = json.dumps({"error": "Invalid JSON arguments. Retry with a JSON object."})
+            else:
+                result = run_tool(call.function.name, args)
             tool_calls += [{"name": call.function.name, "args": args, "result": result}]
 
             messages += [{"role": "tool", "tool_call_id": call.id, "content": result}]
