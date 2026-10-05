@@ -54,12 +54,14 @@
             }
             #input-area {
                 display: flex;
+                flex-wrap: wrap;
                 gap: 1rem;
                 padding: 1.5rem;
                 border-top: 1px solid #e0e0e0;
             }
             #user-input {
                 flex: 1;
+                min-width: 140px;
                 padding: 0.75rem 0;
                 border: none;
                 border-bottom: 1px solid #e0e0e0;
@@ -98,11 +100,69 @@
             button:disabled {
                 opacity: 0.3;
             }
+
+            .content { white-space: pre-wrap; overflow-wrap: anywhere; }
+            .msg.assistant { max-width: 100%; min-width: 0; }
+            .products {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            .product { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; min-width: 0; }
+            .product-image {
+                aspect-ratio: 1;
+                background: #f5f5f5;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #666;
+                font-size: 0.85rem;
+            }
+            .product-image img { width: 100%; height: 100%; object-fit: contain; }
+            .product-details { padding: 0.75rem; }
+            .product h3 { font-size: 0.9rem; overflow-wrap: anywhere; }
+            .product-retailer { color: #666; font-size: 0.8rem; }
+            .product-price { font-weight: 600; margin: 0.35rem 0; }
+            .product a { color: #14532d; font-size: 0.85rem; }
+            .product-note { color: #666; font-size: 0.75rem; margin-top: 0.5rem; }
+            #attachment-area { padding: 0 1.5rem 1rem; font-size: 0.8rem; }
+            #attachment-area p { color: #666; margin-top: 0.4rem; }
+            #attachment-preview { max-width: 140px; max-height: 120px; object-fit: contain; margin-top: 0.5rem; }
+            #attachment-error { color: #b91c1c; }
+            .uploaded-image { display: block; max-width: 240px; max-height: 240px; object-fit: contain; margin-top: 0.5rem; }
+            #examples { padding: 1rem 1.5rem; border-top: 1px solid #e0e0e0; }
+            #examples p { font-size: 0.8rem; color: #666; margin-bottom: 0.6rem; }
+            .prompt-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+            .prompt-button {
+                background: #f6f8f5;
+                color: #28503a;
+                border: 1px solid #d9e3d9;
+                border-radius: 999px;
+                padding: 0.5rem 0.8rem;
+                text-transform: none;
+                letter-spacing: normal;
+                font-size: 0.8rem;
+            }
+            .prompt-button:hover { background: #e9f0e6; }
+            .prompt-button:focus-visible { outline: 2px solid #28503a; outline-offset: 2px; }
         </style>
     </head>
     <body>
         <div id="container">
             <div id="messages"></div>
+            <section id="examples" aria-label="Example prompts">
+                <p>Try an idea — click to edit, then send.</p>
+                <div class="prompt-buttons">
+                    <button type="button" class="prompt-button" data-prompt="Put together a work outfit using items from my closet.">Style a work outfit</button>
+                    <button type="button" class="prompt-button" data-prompt="Find brown jackets under 100 USD per item.">Find a jacket under $100</button>
+                    <button type="button" class="prompt-button" data-prompt="Find Pinterest inspiration for styling a long back boots for fall.">Pinterest inspiration</button>
+                    <button type="button" class="prompt-button" data-prompt="What should I wear from my closet for the current weather in New York?">Dress for the weather</button>
+                    <button type="button" class="prompt-button" data-prompt="Give me three different ways to style an item from my closet.">Restyle what I own</button>
+                    <button type="button" class="prompt-button" data-prompt="Help me create an outfit for a cartoon-character-themed party. Look through my closet first and suggest a character I can dress as using what I own. If anything is missing, find products online to complete the look.">Cartoon character party</button>
+                    <button type="button" class="prompt-button" data-prompt="Find products online similar to my attached photo" data-photo="true">Shop a photo · attach image</button>
+                </div>
+            </section>
             <div id="input-area">
                 <input
                     type="text"
@@ -112,12 +172,84 @@
                 />
                 <button id="send-btn">Send</button>
             </div>
+            <div id="attachment-area">
+                <label for="image-input">Attach a photo</label>
+                <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" />
+                <button type="button" id="remove-image" hidden>Remove photo</button>
+                <p>JPEG, PNG or WebP, up to 5 MB. Sent to Gemini when you press Send to help find similar items.</p>
+                <img id="attachment-preview" alt="Selected outfit photo" hidden />
+                <div id="attachment-error" role="status"></div>
+            </div>
         </div>
         <script>
             const messages = document.getElementById("messages");
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
+            const imageInput = document.getElementById("image-input");
+            const preview = document.getElementById("attachment-preview");
+            const removeImage = document.getElementById("remove-image");
+            const attachmentError = document.getElementById("attachment-error");
+            let selectedImage = null;
+            let imageVersion = 0;
+            let imageLoading = false;
             let sessionId = null;
+
+            document.querySelectorAll(".prompt-button").forEach(button => {
+                button.addEventListener("click", () => {
+                    userInput.value = button.dataset.prompt;
+                    userInput.focus();
+                    if (button.dataset.photo && !selectedImage) {
+                        attachmentError.textContent = "Attach a photo below before sending this prompt.";
+                    } else if (!imageLoading) {
+                        attachmentError.textContent = "";
+                    }
+                });
+            });
+
+            function clearImage() {
+                imageVersion++;
+                selectedImage = null;
+                imageLoading = false;
+                imageInput.value = "";
+                preview.removeAttribute("src");
+                preview.hidden = true;
+                removeImage.hidden = true;
+                attachmentError.textContent = "";
+            }
+            removeImage.addEventListener("click", clearImage);
+            imageInput.addEventListener("change", async () => {
+                const file = imageInput.files[0];
+                clearImage();
+                if (!file) return;
+                if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+                    attachmentError.textContent = "Choose a JPEG, PNG or WebP image under 5 MB.";
+                    return;
+                }
+                const version = imageVersion;
+                imageLoading = true;
+                attachmentError.textContent = "Loading photo…";
+                try {
+                    const data = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                    const check = new Image();
+                    check.src = data;
+                    await check.decode();
+                    if (version !== imageVersion) return;
+                    selectedImage = data;
+                    preview.src = data;
+                    preview.hidden = false;
+                    removeImage.hidden = false;
+                    attachmentError.textContent = "";
+                } catch {
+                    if (version === imageVersion) attachmentError.textContent = "Could not read this photo. Try another image.";
+                } finally {
+                    if (version === imageVersion) imageLoading = false;
+                }
+            });
 
             function addMessage(role, text, isLoading = false) {
                 const div = document.createElement("div");
@@ -125,24 +257,115 @@
                     "msg " +
                     (role === "you" ? "user" : "assistant") +
                     (isLoading ? " loading" : "");
-                div.innerHTML =
-                    '<div class="role">' +
-                    role +
-                    '</div><div class="content">' +
-                    text +
-                    "</div>";
+                const label = document.createElement("div");
+                label.className = "role";
+                label.textContent = role;
+                const content = document.createElement("div");
+                content.className = "content";
+                content.textContent = text;
+                div.append(label, content);
                 messages.appendChild(div);
                 messages.scrollTop = messages.scrollHeight;
                 return div;
             }
 
+            function safeUrl(value) {
+                if (typeof value !== "string") return null;
+                try {
+                    const url = new URL(value);
+                    return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password
+                        ? url.href : null;
+                } catch { return null; }
+            }
+
+            function addSearchCards(parent, calls, toolName) {
+                const isPin = toolName === "search_pinterest_pins";
+                const grid = document.createElement("div");
+                grid.className = "products";
+                grid.setAttribute("aria-label", isPin ? "Pinterest inspiration" : "Product search results");
+                const seen = new Set();
+                for (const call of calls) {
+                    if (call.name !== toolName) continue;
+                    let result;
+                    try { result = JSON.parse(call.result); } catch { continue; }
+                    if (result?.status !== "ok" || !Array.isArray(result.results)) continue;
+                    for (const item of result.results) {
+                        const link = safeUrl(item?.url);
+                        if (!link || seen.has(link)) continue;
+                        seen.add(link);
+                        const card = document.createElement("article");
+                        card.className = "product";
+                        const visual = document.createElement("div");
+                        visual.className = "product-image";
+                        visual.textContent = "Image unavailable";
+                        const imageUrl = safeUrl(item.image_url);
+                        if (imageUrl) {
+                            const img = document.createElement("img");
+                            img.alt = typeof item.title === "string" ? item.title : "Product photo";
+                            img.loading = "lazy";
+                            img.referrerPolicy = "no-referrer";
+                            const fallback = safeUrl(item.thumbnail_url);
+                            let triedFallback = false;
+                            img.addEventListener("error", () => {
+                                if (!triedFallback && fallback && fallback !== imageUrl) {
+                                    triedFallback = true;
+                                    img.src = fallback;
+                                } else { visual.textContent = "Image unavailable"; }
+                            });
+                            img.src = imageUrl;
+                            visual.replaceChildren(img);
+                        }
+                        const details = document.createElement("div");
+                        details.className = "product-details";
+                        const title = document.createElement("h3");
+                        title.textContent = typeof item.title === "string" ? item.title : "Product";
+                        const retailer = document.createElement("div");
+                        retailer.className = "product-retailer";
+                        retailer.textContent = isPin ? "Pinterest" : (typeof item.retailer === "string" ? item.retailer : "");
+                        const price = document.createElement("div");
+                        price.className = "product-price";
+                        price.textContent = typeof item.price_display === "string" && item.price_display
+                            ? item.price_display : "Price unavailable";
+                        const anchor = document.createElement("a");
+                        anchor.href = link;
+                        anchor.target = "_blank";
+                        anchor.rel = "noopener noreferrer";
+                        anchor.textContent = isPin ? "View pin ↗" : "View item ↗";
+                        details.append(title, retailer);
+                        if (!isPin) details.append(price);
+                        details.append(anchor);
+                        card.append(visual, details);
+                        grid.appendChild(card);
+                    }
+                }
+                if (grid.childElementCount) {
+                    const note = document.createElement("p");
+                    note.className = "product-note";
+                    note.textContent = isPin
+                        ? "Public Pinterest inspiration. Open a pin to see its source and details."
+                        : "Search-listed prices; confirm size, availability, shipping and tax on the linked page.";
+                    parent.append(grid, note);
+                }
+            }
+
             async function send() {
+                if (sendBtn.disabled || imageLoading) return;
                 const text = userInput.value.trim();
-                if (!text) return;
+                const image = selectedImage;
+                if (!text && !image) return;
 
                 userInput.value = "";
                 sendBtn.disabled = true;
-                addMessage("you", text);
+                imageInput.disabled = true;
+                removeImage.disabled = true;
+                const userMessage = addMessage("you", text || "Find similar clothing products to this photo.");
+                if (image) {
+                    const photo = document.createElement("img");
+                    photo.className = "uploaded-image";
+                    photo.alt = "Uploaded inspiration photo";
+                    photo.src = image;
+                    userMessage.appendChild(photo);
+                }
                 const loading = addMessage("assistant", "Thinking...", true);
 
                 try {
@@ -152,9 +375,15 @@
                         body: JSON.stringify({
                             message: text,
                             session_id: sessionId,
+                            image,
                         }),
                     });
                     const data = await res.json();
+                    if (!res.ok) {
+                        const detail = Array.isArray(data.detail) ? data.detail.map(e => e.msg).join(" ") : data.detail;
+                        throw new Error(detail || "Could not send the message.");
+                    }
+                    clearImage();
                     sessionId = data.session_id;
 
                     // Show each tool the harness ran, above the assistant's answer
@@ -175,12 +404,17 @@
                     loading.querySelector(".content").textContent =
                         data.response;
                     loading.classList.remove("loading");
+                    addSearchCards(loading, data.tool_calls || [], "search_products");
+                    addSearchCards(loading, data.tool_calls || [], "search_pinterest_pins");
+                    messages.scrollTop = messages.scrollHeight;
                 } catch (e) {
                     loading.querySelector(".content").textContent =
                         "Error: " + e.message;
                     loading.classList.remove("loading");
                 }
                 sendBtn.disabled = false;
+                imageInput.disabled = false;
+                removeImage.disabled = false;
                 userInput.focus();
             }
 

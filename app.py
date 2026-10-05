@@ -1,14 +1,17 @@
+import base64
+import binascii
 import json
 import uuid
 from pathlib import Path
 
 import litellm
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field, field_validator, model_validator
 
-from tools import TOOLS, run_tool
+from tools import TOOLS, run_tool, search_closet, CLOSET_PATH
 
 # --- Config ---
 
@@ -70,11 +73,44 @@ sessions: dict[str, list] = {}
 # --- FastAPI App ---
 
 app = FastAPI()
+STATIC_PATH = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_PATH), name="static")
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = ""
     session_id: str | None = None
+    image: str | None = Field(default=None, max_length=7_000_000)
+
+    @field_validator("image")
+    @classmethod
+    def validate_image(cls, value):
+        if value is None:
+            return value
+        header, separator, encoded = value.partition(",")
+        allowed = {"data:image/jpeg;base64", "data:image/png;base64", "data:image/webp;base64"}
+        if not separator or header not in allowed:
+            raise ValueError("Upload a JPEG, PNG or WebP image.")
+        try:
+            raw = base64.b64decode(encoded, validate=True)
+        except (ValueError, binascii.Error):
+            raise ValueError("Invalid image encoding.")
+        if not raw or len(raw) > 5 * 1024 * 1024:
+            raise ValueError("Images must be between 1 byte and 5 MB.")
+        signatures = {
+            "data:image/jpeg;base64": raw.startswith(b"\xff\xd8\xff"),
+            "data:image/png;base64": raw.startswith(b"\x89PNG\r\n\x1a\n"),
+            "data:image/webp;base64": raw.startswith(b"RIFF") and raw[8:12] == b"WEBP",
+        }
+        if not signatures[header]:
+            raise ValueError("Image content does not match its file type.")
+        return value
+
+    @model_validator(mode="after")
+    def require_content(self):
+        if not self.message.strip() and not self.image:
+            raise ValueError("Enter a message or attach an image.")
+        return self
 
 
 class ChatResponse(BaseModel):
@@ -88,6 +124,36 @@ def index():
     return FileResponse(Path(__file__).parent / "index.html")
 
 
+@app.get("/closet")
+def closet():
+    result = json.loads(search_closet())
+    if "error" in result:
+        raise HTTPException(status_code=500, detail="Could not load the closet.")
+    return result
+
+
+@app.post("/closet/{item_id}/image")
+def save_closet_image(item_id: int, request: ChatRequest):
+    """Save a user-selected photo locally for an existing wardrobe item."""
+    if not request.image:
+        raise HTTPException(status_code=400, detail="Attach a photo to save.")
+    try:
+        items = json.loads(CLOSET_PATH.read_text())
+        item = next((item for item in items if item["id"] == item_id), None)
+        if item is None:
+            raise HTTPException(status_code=404, detail="Closet item not found.")
+        header, encoded = request.image.split(",", 1)
+        extension = {"data:image/jpeg;base64": "jpg", "data:image/png;base64": "png", "data:image/webp;base64": "webp"}[header]
+        filename = f"photo-{item_id}-{uuid.uuid4().hex[:12]}.{extension}"
+        (STATIC_PATH / "closet" / filename).write_bytes(base64.b64decode(encoded))
+        item["image_url"] = f"/static/closet/{filename}"
+        item["image_kind"] = "photo"
+        CLOSET_PATH.write_text(json.dumps(items, indent=4) + "\n")
+    except (OSError, ValueError):
+        raise HTTPException(status_code=500, detail="Could not save the closet photo.")
+    return item
+
+
 @app.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
     # Get or create the session
@@ -96,7 +162,13 @@ def chat(request: ChatRequest):
         sessions[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
 
     # Append user's message to the context
-    sessions[session_id] += [{"role": "user", "content": request.message}]
+    content = request.message
+    if request.image:
+        content = [
+            {"type": "text", "text": request.message.strip() or "Find similar clothing products to those in this photo."},
+            {"type": "image_url", "image_url": {"url": request.image}},
+        ]
+    sessions[session_id] += [{"role": "user", "content": content}]
 
     try:
         response, tool_calls = run_agent(sessions[session_id])
