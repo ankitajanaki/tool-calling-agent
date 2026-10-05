@@ -14,7 +14,9 @@
             "work",
             "classic",
             "layering"
-        ]
+        ],
+        "image_url": "/static/closet/reference-1.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 2,
@@ -31,7 +33,9 @@
             "casual",
             "basic",
             "layering"
-        ]
+        ],
+        "image_url": "/static/closet/reference-2.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 3,
@@ -46,7 +50,9 @@
             "casual",
             "classic",
             "french"
-        ]
+        ],
+        "image_url": "/static/closet/reference-3.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 4,
@@ -60,7 +66,9 @@
         "tags": [
             "casual",
             "cozy"
-        ]
+        ],
+        "image_url": "/static/closet/reference-4.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 5,
@@ -74,7 +82,9 @@
         "tags": [
             "evening",
             "formal"
-        ]
+        ],
+        "image_url": "/static/closet/reference-5.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 6,
@@ -89,7 +99,9 @@
             "work",
             "minimal",
             "layering"
-        ]
+        ],
+        "image_url": "/static/closet/reference-6.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 7,
@@ -103,7 +115,9 @@
             "casual",
             "vacation",
             "relaxed"
-        ]
+        ],
+        "image_url": "/static/closet/reference-7.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 8,
@@ -120,7 +134,9 @@
             "casual",
             "denim",
             "basic"
-        ]
+        ],
+        "image_url": "/static/closet/reference-8.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 9,
@@ -136,7 +152,9 @@
             "work",
             "formal",
             "minimal"
-        ]
+        ],
+        "image_url": "/static/closet/reference-9.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 10,
@@ -150,7 +168,9 @@
         "tags": [
             "work",
             "polished"
-        ]
+        ],
+        "image_url": "/static/closet/reference-10.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 11,
@@ -163,7 +183,9 @@
         ],
         "tags": [
             "work"
-        ]
+        ],
+        "image_url": "/static/closet/reference-11.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 12,
@@ -177,7 +199,9 @@
             "casual",
             "vacation",
             "denim"
-        ]
+        ],
+        "image_url": "/static/closet/reference-12.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 13,
@@ -192,7 +216,9 @@
         "tags": [
             "evening",
             "classic"
-        ]
+        ],
+        "image_url": "/static/closet/reference-13.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 14,
@@ -206,7 +232,9 @@
         "tags": [
             "brunch",
             "wedding-guest"
-        ]
+        ],
+        "image_url": "/static/closet/reference-14-single.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 15,
@@ -220,7 +248,9 @@
         "tags": [
             "work",
             "cozy"
-        ]
+        ],
+        "image_url": "/static/closet/reference-15-single.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 16,
@@ -236,7 +266,9 @@
             "work",
             "formal",
             "layering"
-        ]
+        ],
+        "image_url": "/static/closet/reference-16.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 17,
@@ -250,7 +282,9 @@
         "tags": [
             "classic",
             "polished"
-        ]
+        ],
+        "image_url": "/static/closet/reference-17.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 18,
@@ -265,7 +299,9 @@
             "casual",
             "denim",
             "layering"
-        ]
+        ],
+        "image_url": "/static/closet/reference-18.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 19,
@@ -280,7 +316,9 @@
             "edgy",
             "evening",
             "casual"
-        ]
+        ],
+        "image_url": "/static/closet/reference-19.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 20,
@@ -295,7 +333,9 @@
             "classic",
             "work",
             "rain"
-        ]
+        ],
+        "image_url": "/static/closet/reference-20.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 21,
@@ -311,7 +351,9 @@
             "casual",
             "basic",
             "comfortable"
-        ]
+        ],
+        "image_url": "/static/closet/reference-21.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 22,
@@ -325,7 +367,9 @@
         "tags": [
             "casual",
             "work"
-        ]
+        ],
+        "image_url": "/static/closet/reference-22.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 23,
@@ -341,7 +385,9 @@
             "work",
             "formal",
             "wedding-guest"
-        ]
+        ],
+        "image_url": "/static/closet/reference-23.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 24,
@@ -354,7 +400,9 @@
         "tags": [
             "casual",
             "vacation"
-        ]
+        ],
+        "image_url": "/static/closet/reference-24.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 25,
@@ -368,7 +416,9 @@
         "tags": [
             "work",
             "comfortable"
-        ]
+        ],
+        "image_url": "/static/closet/reference-25.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 26,
@@ -384,7 +434,9 @@
         "tags": [
             "work",
             "classic"
-        ]
+        ],
+        "image_url": "/static/closet/reference-26.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 27,
@@ -397,7 +449,9 @@
         "tags": [
             "vacation",
             "casual"
-        ]
+        ],
+        "image_url": "/static/closet/reference-27.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 28,
@@ -413,7 +467,9 @@
         "tags": [
             "everyday",
             "classic"
-        ]
+        ],
+        "image_url": "/static/closet/reference-28.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 29,
@@ -427,7 +483,9 @@
         "tags": [
             "polished",
             "statement"
-        ]
+        ],
+        "image_url": "/static/closet/reference-29.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 30,
@@ -444,7 +502,9 @@
             "basic",
             "work",
             "casual"
-        ]
+        ],
+        "image_url": "/static/closet/reference-30.jpg",
+        "image_kind": "ai_reference"
     },
     {
         "id": 31,
@@ -457,6 +517,26 @@
         "tags": [
             "casual",
             "vacation"
-        ]
+        ],
+        "image_url": "/static/closet/reference-31.jpg",
+        "image_kind": "ai_reference"
+    },
+    {
+        "id": 32,
+        "name": "Brown suede leather jacket",
+        "category": "outerwear",
+        "color": "brown",
+        "season": [
+            "fall",
+            "spring",
+            "winter"
+        ],
+        "tags": [
+            "casual",
+            "outerwear",
+            "leather"
+        ],
+        "image_url": "/static/closet/reference-32.jpg",
+        "image_kind": "ai_reference"
     }
 ]
