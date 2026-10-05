@@ -1,6 +1,8 @@
 import base64
 import binascii
 import json
+import os
+from typing import Literal
 import uuid
 from pathlib import Path
 
@@ -19,7 +21,8 @@ SYSTEM_PROMPT = (
     "You are a concise personal styling assistant. Help users style what they own, "
     "consider the occasion and weather, and find new pieces when requested. "
     "Ask for missing details when needed. Ground recommendations in available information "
-    "and be clear about uncertainty."
+    "and be clear about uncertainty. When recommending closet outfits, call present_outfits "
+    "with the exact pieces for every outfit before answering."
 )
 MAX_TOOL_ROUNDS = 5
 
@@ -33,13 +36,19 @@ def run_agent(messages: list[dict]) -> tuple[str, list[dict]]:
     """
     tool_calls = []
 
-    for _ in range(MAX_TOOL_ROUNDS):
-        reply = litellm.completion(
-            model="vertex_ai/gemini-3.5-flash-lite",
-            vertex_location="global",
-            messages=messages,
-            tools=TOOLS,
-        ).choices[0].message
+    for round_number in range(MAX_TOOL_ROUNDS + 1):
+        try:
+            options = {"tools": TOOLS} if round_number < MAX_TOOL_ROUNDS else {}
+            reply = litellm.completion(
+                model="vertex_ai/gemini-3.5-flash-lite",
+                vertex_location="global",
+                messages=messages,
+                **options,
+            ).choices[0].message
+        except Exception:
+            # Keep calls already completed visible, and never expose provider credentials/tracebacks.
+            return ("I couldn’t reach the styling model. Please try again. If this keeps happening, "
+                    "the app owner should check the Google Cloud project, model access and credentials."), tool_calls
 
         # Append assistant's reply (text, tool calls, or both) to the context.
         # model_dump() keeps it a plain dict: the raw object carries provider-specific
@@ -47,7 +56,7 @@ def run_agent(messages: list[dict]) -> tuple[str, list[dict]]:
         messages += [reply.model_dump()]
 
         if not reply.tool_calls:
-            return reply.content, tool_calls
+            return reply.content or "I couldn’t finish that answer. Please try rephrasing your request.", tool_calls
 
         # The harness, not the model, runs each tool and appends the result
         for call in reply.tool_calls:
@@ -77,9 +86,15 @@ STATIC_PATH = Path(__file__).parent / "static"
 app.mount("/static", StaticFiles(directory=STATIC_PATH), name="static")
 
 
+class ConversationTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(max_length=20000)
+
+
 class ChatRequest(BaseModel):
     message: str = ""
-    session_id: str | None = None
+    session_id: str | None = Field(default=None, max_length=128)
+    history: list[ConversationTurn] = Field(default_factory=list, max_length=40)
     image: str | None = Field(default=None, max_length=7_000_000)
 
     @field_validator("image")
@@ -159,7 +174,11 @@ def chat(request: ChatRequest):
     # Get or create the session
     session_id = request.session_id or str(uuid.uuid4())
     if session_id not in sessions:
-        sessions[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
+        # The tab carries recent text turns so Cloud Run instance changes don't erase the conversation.
+        # Only user/assistant text is accepted, never client-supplied system or tool messages.
+        sessions[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}] + [turn.model_dump() for turn in request.history]
+
+    sessions[session_id][0] = {"role": "system", "content": SYSTEM_PROMPT}
 
     # Append user's message to the context
     content = request.message
@@ -172,9 +191,9 @@ def chat(request: ChatRequest):
 
     try:
         response, tool_calls = run_agent(sessions[session_id])
-    except Exception as e:
+    except Exception:
         # Auth, billing, a model that is not running: show it in the chat, not as a 500.
-        response, tool_calls = f"Model call failed: {type(e).__name__}: {str(e)[:300]}", []
+        response, tool_calls = "Something went wrong while styling that look. Please try again or start a new chat.", []
 
     return ChatResponse(response=response, session_id=session_id, tool_calls=tool_calls)
 
@@ -186,4 +205,4 @@ def clear(session_id: str | None = None):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))

@@ -9,7 +9,9 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 import requests
-from wardrobe_images import create_illustration
+
+CATEGORIES = ('tops', 'bottoms', 'dresses', 'outerwear', 'shoes', 'bags', 'accessories', 'jewelry')
+SEASONS = ('spring', 'summer', 'fall', 'winter')
 
 # Open-Meteo is free and needs no API key.
 GEOCODE_URL = "https://geocoding-api.open-meteo.com/v1/search"
@@ -181,7 +183,7 @@ def search_closet(category = None, color = None, season = None, tag = None, quer
     try:
         with open(CLOSET_PATH) as f:
             closet = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except (OSError, json.JSONDecodeError) as e:
         return json.dumps({"error": f"Could not read closet: {e}"})
 
     filtered = []
@@ -210,9 +212,19 @@ def add_closet_item(name: str, category: str, color: str, season: list, tags: li
     try:
         with open(CLOSET_PATH) as f:
             closet = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except (OSError, json.JSONDecodeError) as e:
         return json.dumps({"error": f"Could not read closet: {e}"})
 
+    if not isinstance(name, str) or not name.strip() or len(name) > 200:
+        return json.dumps({"error": "Provide an item name of 1–200 characters."})
+    if not isinstance(category, str) or category.lower() not in CATEGORIES:
+        return json.dumps({"error": "Use a category from the add_closet_item schema."})
+    if not isinstance(color, str) or not color.strip() or len(color) > 40:
+        return json.dumps({"error": "Provide a short color description."})
+    if not isinstance(season, list) or not season or any(not isinstance(s, str) or s.lower() not in SEASONS for s in season):
+        return json.dumps({"error": "Provide at least one season: spring, summer, fall or winter."})
+    if not isinstance(tags, list) or any(not isinstance(t, str) or not t.strip() for t in tags):
+        return json.dumps({"error": "Provide tags as a list of nonempty style or occasion words."})
     next_id = max((i["id"] for i in closet), default=0) + 1
     item = {
         "id": next_id,
@@ -222,8 +234,6 @@ def add_closet_item(name: str, category: str, color: str, season: list, tags: li
         "season": [s.lower() for s in season],
         "tags": [t.lower() for t in tags]
     }
-    item["image_url"] = create_illustration(item)
-    item["image_kind"] = "illustration"
     closet.append(item)
 
     with open(CLOSET_PATH, "w") as f:
@@ -240,7 +250,7 @@ def get_closet_stats() -> str:
     try:
         with open(CLOSET_PATH) as f:
             closet = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError) as e:
+    except (OSError, json.JSONDecodeError) as e:
         return json.dumps({"error": f"Could not read closet: {e}"})
 
     category_totals = Counter(item["category"] for item in closet)
@@ -256,13 +266,17 @@ def get_closet_stats() -> str:
 
 def get_weather(location: str) -> str:
     """Get the current weather for a location."""
+    if not isinstance(location, str) or not location.strip():
+        return json.dumps({"error": "Provide a city name, for example New York."})
     try:
-        places = requests.get(GEOCODE_URL, params={"name": location, "count": 1}, timeout=10).json()
+        geocoding = requests.get(GEOCODE_URL, params={"name": location, "count": 1}, timeout=10)
+        geocoding.raise_for_status()
+        places = geocoding.json()
         if not places.get("results"):
             return json.dumps({"error": f"City '{location}' was not found."})
         place = places["results"][0]
 
-        current = requests.get(
+        weather_response = requests.get(
             FORECAST_URL,
             params={
                 "latitude": place["latitude"],
@@ -272,21 +286,74 @@ def get_weather(location: str) -> str:
                 "wind_speed_unit": "mph",
             },
             timeout=10,
-        ).json()["current"]
-    except requests.RequestException as e:
-        # The model cannot see an exception. Return something it can reason about.
-        return json.dumps({"error": f"Weather service failed: {e}"})
+        )
+        weather_response.raise_for_status()
+        current = weather_response.json()["current"]
+        return json.dumps({
+            "location": place["name"],
+            "temp_f": current["temperature_2m"],
+            "humidity": current["relative_humidity_2m"],
+            "wind_mph": current["wind_speed_10m"],
+        })
+    except (requests.RequestException, ValueError, KeyError, TypeError, AttributeError):
+        return json.dumps({"error": "Weather is temporarily unavailable. Try again with a city and country, or ask for general seasonal styling."})
 
-    return json.dumps({
-        "location": place["name"],
-        "temp_f": current["temperature_2m"],
-        "humidity": current["relative_humidity_2m"],
-        "wind_mph": current["wind_speed_10m"],
-    })
+
+def present_outfits(outfits: list) -> str:
+    """Resolve explicit outfit selections to local closet images, without changing data."""
+    if not isinstance(outfits, list) or not 1 <= len(outfits) <= 6:
+        return json.dumps({"error": "Provide between 1 and 6 outfits."})
+    try:
+        closet = {item["id"]: item for item in json.loads(CLOSET_PATH.read_text())}
+    except (OSError, ValueError, KeyError):
+        return json.dumps({"error": "Could not read the closet."})
+    order = {"tops": 0, "dresses": 0, "outerwear": 1, "bottoms": 2,
+             "shoes": 3, "bags": 4, "accessories": 4, "jewelry": 4}
+    selected = []
+    for outfit in outfits:
+        if not isinstance(outfit, dict):
+            return json.dumps({"error": "Each outfit needs a title and item_ids."})
+        title, ids = outfit.get("title"), outfit.get("item_ids")
+        if not isinstance(title, str) or not title.strip() or len(title) > 120:
+            return json.dumps({"error": "Each outfit needs a title of 1–120 characters."})
+        if not isinstance(ids, list) or not 1 <= len(ids) <= 12 or any(type(i) is not int for i in ids):
+            return json.dumps({"error": "item_ids must contain 1–12 integer closet IDs."})
+        missing = [i for i in ids if i not in closet]
+        if missing:
+            return json.dumps({"error": "Unknown closet IDs. Search the closet and retry.", "item_ids": missing})
+        clothing = sorted((closet[i] for i in dict.fromkeys(ids)),
+                          key=lambda item: order.get(item.get("category"), 5))
+        selected.append({"title": title.strip(), "clothing": clothing})
+    return json.dumps({"status": "ok", "outfits": selected})
 
 
 # What the model sees: the "set notes" in the screenplay.
 TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "present_outfits",
+            "description": "Display the final closet outfits you recommend. After searching the closet, call once with all recommended outfits and only the exact item IDs used in each. Build complete outfits around the user's chosen piece, including a top and bottoms (or a dress), plus shoes when available in the closet. Never include unrelated search candidates. Use the same outfit titles and pieces in your answer. Returns images arranged top, bottoms, shoes, then accessories. Does not save or modify the closet.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "outfits": {
+                        "type": "array", "minItems": 1, "maxItems": 6,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "title": {"type": "string", "minLength": 1, "maxLength": 120},
+                                "item_ids": {"type": "array", "minItems": 1, "maxItems": 12,
+                                             "items": {"type": "integer"}},
+                            },
+                            "required": ["title", "item_ids"], "additionalProperties": False,
+                        },
+                    },
+                },
+                "required": ["outfits"], "additionalProperties": False,
+            },
+        },
+    },
     {
         "type": "function",
         "function": {
@@ -338,7 +405,7 @@ TOOLS = [
             "type": "function",
             "function": {
                 "name": "search_closet",
-                "description": "Searches through your closet to find items that match what you are looking for.",
+                "description": "Read owned items and their IDs, photos, seasons and style tags. Use no filters to discover the wardrobe before planning outfits; combine filters only when needed. An empty result means no items matched those filters, not an empty wardrobe. Never invent IDs.",
                 "parameters": {
                     "type": "object",
                         "properties": {
@@ -346,7 +413,7 @@ TOOLS = [
                                                     "shoes", "bags", "accessories", "jewelry"]},
                             "color":    {"type": "string", "description": "Single color word, e.g. 'black'"},
                             "season":   {"type": "string", "enum": ["spring", "summer", "fall", "winter"]},
-                            "tag":      {"type": "string", "description": "Occasion or style, e.g. 'work', 'evening', 'vacation'"},
+                            "tag":      {"type": "string", "description": "Optional tag from the wardrobe; first inspect available tags if unsure, e.g. work or vacation."},
                             "query":    {"type": "string", "description": "Free-text words to match in item names, e.g. 'silk' or 'blazer'"},
                         },
                 "required": [],
@@ -387,7 +454,7 @@ TOOLS = [
 ]
 
 # What the harness runs: tool name -> Python function.
-TOOL_MAP = {"search_pinterest_pins": search_pinterest_pins,"search_products": search_products, "get_weather": get_weather, "search_closet": search_closet, "add_closet_item": add_closet_item, "get_closet_stats": get_closet_stats}
+TOOL_MAP = {"present_outfits": present_outfits, "search_pinterest_pins": search_pinterest_pins,"search_products": search_products, "get_weather": get_weather, "search_closet": search_closet, "add_closet_item": add_closet_item, "get_closet_stats": get_closet_stats}
 
 
 def run_tool(name: str, args: dict) -> str:
@@ -398,5 +465,7 @@ def run_tool(name: str, args: dict) -> str:
         return json.dumps({"error": "Tool arguments must be a JSON object."})
     try:
         return TOOL_MAP[name](**args)
-    except TypeError as e:
-        return json.dumps({"error": f"Bad arguments for {name}: {e}"})
+    except (TypeError, ValueError, AttributeError):
+        return json.dumps({"error": f"Invalid arguments or data for {name}. Check the tool schema and retry."})
+    except (OSError, KeyError):
+        return json.dumps({"error": f"{name} could not read or save its data. Try again; if it persists, check the server data or provider response."})

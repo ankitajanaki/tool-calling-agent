@@ -3,184 +3,200 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Gemini Web Tool Calling</title>
+        <title>Styled by Ankita &amp; Arshnoor</title>
         <style>
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
+            :root { --paper:#f7f3ed; --ink:#302824; --muted:#786d65; --line:#e5dbd1; --wine:#713c45; --soft:#efe6dc; }
+            * { box-sizing:border-box; margin:0; padding:0; }
+            body { background:var(--paper); color:var(--ink); font:15px/1.5 system-ui,sans-serif; }
+            button,input { font:inherit; }
+            button { cursor:pointer; border:0; border-radius:8px; padding:.7rem 1rem; color:#fff; background:var(--wine); }
+            button:hover { filter:brightness(.95); }
+            button:disabled { opacity:.5; cursor:wait; }
+            button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible { outline:3px solid #a36b52; outline-offset:3px; }
+            [hidden] { display:none !important; }
+            .shell { max-width:1440px; margin:auto; padding:0 2.5rem; }
+            .site-header { display:flex; justify-content:space-between; align-items:center; gap:1rem; min-height:105px; border-bottom:1px solid var(--line); }
+            .wordmark { font:42px/1 Georgia,serif; letter-spacing:-2px; }
+            .byline { font-size:12px; color:var(--muted); margin-top:.35rem; letter-spacing:.02em; }
+            .header-actions { display:flex; gap:.6rem; }
+            .secondary { background:transparent; color:var(--wine); border:1px solid var(--line); }
+            .workspace { display:grid; grid-template-columns:300px minmax(0,1fr); gap:2.5rem; padding:1.8rem 0; height:calc(100dvh - 105px); min-height:610px; }
+            .studio-intro { overflow-y:auto; padding-right:.2rem; }
+            .eyebrow { font-size:10px; text-transform:uppercase; letter-spacing:.16em; color:var(--wine); font-weight:700; }
+            .studio-intro h2 { font:38px/1.12 Georgia,serif; letter-spacing:-1px; margin:.8rem 0; }
+            .intro-copy { font-size:13px; color:var(--muted); line-height:1.7; }
+            .wardrobe-preview { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin:1.2rem 0 .5rem; }
+            .wardrobe-preview img { width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:40px 40px 6px 6px; border:1px solid var(--line); }
+            .preview-caption { font-size:10px; color:var(--muted); }
+            #examples { margin:1.5rem 0; }
+            #examples > p { font-size:12px; font-weight:600; margin-bottom:.7rem; }
+            .prompt-buttons { display:flex; flex-wrap:wrap; gap:.45rem; }
+            .prompt-button { background:#fffaf5; color:var(--ink); border:1px solid var(--line); border-radius:7px; padding:.5rem .7rem; font-size:11px; text-align:left; }
+            .prompt-button:hover { border-color:var(--wine); background:#efe2df; }
+            .studio-tip { font-size:11px; color:var(--muted); padding-top:1rem; border-top:1px solid var(--line); }
+            #container { min-width:0; min-height:0; display:flex; flex-direction:column; border:1px solid var(--line); border-radius:16px; background:#fff; box-shadow:0 8px 35px #4b352308; overflow:hidden; }
+            .chat-header { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.4rem; border-bottom:1px solid var(--line); }
+            .chat-header h2 { font-size:14px; font-weight:600; }
+            .chat-header p { font-size:11px; color:var(--muted); }
+            .session-badge { font-size:10px; color:var(--wine); background:#f5eceb; padding:.35rem .6rem; border-radius:20px; white-space:nowrap; }
+            #messages { flex:1; min-height:160px; overflow-y:auto; padding:1.5rem; display:flex; flex-direction:column; gap:1.4rem; scroll-behavior:smooth; }
+            #welcome { margin:auto; max-width:430px; padding:2rem 0; text-align:center; }
+            #welcome .welcome-mark { display:inline-flex; width:46px; height:46px; align-items:center; justify-content:center; border:1px solid var(--line); border-radius:50%; color:var(--wine); font:24px Georgia,serif; }
+            #welcome h3 { font:28px/1.2 Georgia,serif; margin:1rem 0 .6rem; }
+            #welcome p { font-size:13px; color:var(--muted); }
+            .welcome-steps { display:flex; justify-content:center; flex-wrap:wrap; gap:.8rem; margin-top:1.2rem; font-size:10px; color:var(--wine); }
+            .msg { line-height:1.6; max-width:90%; flex-shrink:0; }
+            .msg.user { align-self:flex-end; background:#f4ede7; border-radius:14px 14px 3px 14px; padding:.7rem 1rem; }
+            .msg.assistant { max-width:100%; min-width:0; }
+            .role { font-size:9px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:.4rem; }
+            .content { white-space:pre-wrap; overflow-wrap:anywhere; font-size:13px; }
+            .loading .content { color:var(--muted); }
+            .content.markdown { white-space:normal; }
+            .markdown p,.markdown ul,.markdown ol,.markdown pre,.markdown blockquote { margin:.6rem 0; }
+            .markdown > :first-child { margin-top:0; } .markdown > :last-child { margin-bottom:0; }
+            .markdown ul,.markdown ol { padding-left:1.5rem; } .markdown li { margin:.2rem 0; }
+            .markdown h1,.markdown h2,.markdown h3,.markdown h4 { font-size:1rem; margin:.8rem 0 .4rem; }
+            .markdown a,.product a { color:var(--wine); }
+            .markdown pre { overflow-x:auto; padding:.5rem; background:var(--paper); white-space:pre; }
+            .markdown blockquote { border-left:3px solid var(--line); padding-left:.75rem; color:var(--muted); }
+            .markdown table { display:block; overflow-x:auto; border-collapse:collapse; }
+            .markdown th,.markdown td { border:1px solid var(--line); padding:.4rem; }
+            .tool { flex-shrink:0; background:#fcf8f1; border:1px solid #e8d7bc; border-radius:8px; font-size:11px; color:#735734; }
+            .tool summary { cursor:pointer; padding:.65rem .8rem; overflow-wrap:anywhere; }
+            .tool pre { padding:.8rem; border-top:1px solid #e8d7bc; white-space:pre-wrap; overflow-wrap:anywhere; max-height:280px; overflow-y:auto; font:11px/1.6 ui-monospace,monospace; color:var(--ink); }
+            .products,.outfits { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr)); gap:.8rem; margin-top:1rem; }
+            .product { border:1px solid var(--line); border-radius:10px; overflow:hidden; min-width:0; background:#fff; }
+            .product-image { aspect-ratio:1; background:#f7f5f1; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:12px; }
+            .product-image img { width:100%; height:100%; object-fit:contain; }
+            .product-details { padding:.7rem; }
+            .product h3 { font-size:12px; overflow-wrap:anywhere; }
+            .product-retailer,.product a { font-size:11px; }
+            .product-price { font-weight:600; margin:.35rem 0; }
+            .product-note { color:var(--muted); font-size:10px; margin-top:.5rem; }
+            .outfit { min-width:0; padding:.75rem; border:1px solid var(--line); border-radius:12px; background:#fffcf8; }
+            .outfit > h3 { font:18px Georgia,serif; margin-bottom:.75rem; }
+            .outfit .closet-item { border:0; border-radius:0; display:grid; grid-template-columns:42% 58%; align-items:center; background:transparent; }
+            .outfit .product-image { height:85px; aspect-ratio:auto; }
+            .outfit .product-details { padding:.4rem .5rem; }
+            .outfit .product-details h3 { font-size:11px; font-weight:500; }
+            .outfit .product-note { font-size:9px; margin-top:.15rem; }
+            .composer { border-top:1px solid var(--line); background:#fffcf9; }
+            #input-area { display:flex; gap:.6rem; padding:1rem 1.2rem .6rem; }
+            #user-input { flex:1; min-width:0; padding:.7rem; border:1px solid var(--line); border-radius:8px; background:white; font-size:13px; color:var(--ink); }
+            #send-btn { font-size:12px; }
+            #attachment-area { padding:0 1.2rem .8rem; font-size:11px; }
+            .attach-label { cursor:pointer; color:var(--wine); display:inline-block; border-bottom:1px dotted var(--wine); }
+            #image-input { position:absolute; width:1px; height:1px; opacity:0; }
+            #attachment-area:focus-within .attach-label { outline:1px solid var(--wine); }
+            #attachment-area p { color:var(--muted); font-size:10px; margin-top:.35rem; }
+            #remove-image { font-size:10px; padding:.2rem .5rem; margin-left:.5rem; }
+            #attachment-preview { max-width:100px; max-height:80px; object-fit:contain; margin-top:.5rem; }
+            #attachment-error { color:#a32135; }
+            .uploaded-image { display:block; max-width:220px; max-height:200px; object-fit:contain; margin-top:.5rem; }
+            .app-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.2rem; border-bottom:1px solid var(--line); }
+            .app-header h2 { font:26px Georgia,serif; }
+            #closet-panel { position:fixed; inset:0 0 0 auto; width:min(420px,100%); height:100dvh; max-height:none; margin:0 0 0 auto; padding:0; border:0; background:var(--paper); color:var(--ink); }
+            #closet-panel::backdrop { background:rgb(40 25 20 / 35%); backdrop-filter:blur(2px); }
+            .closet-body { height:100%; display:flex; flex-direction:column; }
+            #closet-scroll { overflow-y:auto; padding:1.2rem; }
+            #closet-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+            #closet-status { font-size:12px; color:var(--muted); }
+            .closet-photo-label { display:block; margin-top:.7rem; font-size:10px; color:var(--wine); cursor:pointer; }
+            .closet-photo-label input { display:block; max-width:100%; font-size:10px; margin-top:.3rem; }
+            @media (min-width:1500px) { .workspace { max-height:1050px; } }
+            @media (max-width:1000px) { .shell { padding:0 1.2rem; } .workspace { grid-template-columns:235px minmax(0,1fr); gap:1.2rem; } .studio-intro h2 { font-size:31px; } }
+            @media (max-width:700px) {
+                .shell { padding:0 .8rem; } .site-header { min-height:90px; } .wordmark { font-size:34px; } .byline { font-size:10px; }
+                .header-actions { gap:.3rem; } .header-actions button { padding:.55rem .65rem; font-size:11px; }
+                .workspace { display:flex; flex-direction:column; height:auto; min-height:0; gap:1rem; padding:1rem 0; }
+                .studio-intro { overflow:visible; } .studio-intro h2 { font-size:29px; margin:.35rem 0; } .intro-copy { font-size:12px; }
+                .wardrobe-preview,.preview-caption,.studio-tip { display:none; } #examples { margin:.8rem 0 0; } #examples > p { font-size:11px; }
+                .prompt-buttons { flex-wrap:nowrap; overflow-x:auto; padding-bottom:.3rem; } .prompt-buttons button { flex-shrink:0; }
+                #container { height:72dvh; min-height:480px; } #messages { padding:1rem; } .chat-header { padding:.8rem 1rem; }
+                .session-badge { display:none; } #input-area { padding:.8rem .8rem .5rem; } #attachment-area { padding:0 .8rem .7rem; }
             }
-            body {
-                font-family: system-ui, sans-serif;
-                height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 3rem 1rem;
-            }
-            #container {
-                width: 100%;
-                max-width: 900px;
-                display: flex;
-                flex-direction: column;
-                border: 1px solid #e0e0e0;
-            }
-            #messages {
-                overflow-y: auto;
-                padding: 2rem;
-                display: flex;
-                flex-direction: column;
-                gap: 1.5rem;
-                min-height: 450px;
-                max-height: 70vh;
-            }
-            .msg {
-                line-height: 1.5;
-                max-width: 80%;
-            }
-            .msg.user {
-                align-self: flex-end;
-                text-align: right;
-            }
-            .msg .role {
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: #999;
-                margin-bottom: 0.25rem;
-            }
-            .msg.loading .content {
-                color: #999;
-            }
-            #input-area {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 1rem;
-                padding: 1.5rem;
-                border-top: 1px solid #e0e0e0;
-            }
-            #user-input {
-                flex: 1;
-                min-width: 140px;
-                padding: 0.75rem 0;
-                border: none;
-                border-bottom: 1px solid #e0e0e0;
-                font-size: 1rem;
-                outline: none;
-            }
-            #user-input:focus {
-                border-bottom-color: #000;
-            }
-            button {
-                padding: 0.75rem 1.5rem;
-                background: #000;
-                color: #fff;
-                border: none;
-                font-size: 0.75rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                cursor: pointer;
-            }
-            .tool {
-                font-family: ui-monospace, monospace;
-                font-size: 0.75rem;
-                color: #555;
-                background: #f5f5f5;
-                border-left: 3px solid #f59e0b;
-                padding: 0.5rem 0.75rem;
-                margin: 0.25rem 0 0.75rem;
-                white-space: pre-wrap;
-                word-break: break-word;
-            }
-            .tool .label {
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: #b45309;
-            }
-            button:disabled {
-                opacity: 0.3;
-            }
-
-            .content { white-space: pre-wrap; overflow-wrap: anywhere; }
-            .msg.assistant { max-width: 100%; min-width: 0; }
-            .products {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
-                gap: 1rem;
-                margin-top: 1rem;
-            }
-            .product { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; min-width: 0; }
-            .product-image {
-                aspect-ratio: 1;
-                background: #f5f5f5;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #666;
-                font-size: 0.85rem;
-            }
-            .product-image img { width: 100%; height: 100%; object-fit: contain; }
-            .product-details { padding: 0.75rem; }
-            .product h3 { font-size: 0.9rem; overflow-wrap: anywhere; }
-            .product-retailer { color: #666; font-size: 0.8rem; }
-            .product-price { font-weight: 600; margin: 0.35rem 0; }
-            .product a { color: #14532d; font-size: 0.85rem; }
-            .product-note { color: #666; font-size: 0.75rem; margin-top: 0.5rem; }
-            #attachment-area { padding: 0 1.5rem 1rem; font-size: 0.8rem; }
-            #attachment-area p { color: #666; margin-top: 0.4rem; }
-            #attachment-preview { max-width: 140px; max-height: 120px; object-fit: contain; margin-top: 0.5rem; }
-            #attachment-error { color: #b91c1c; }
-            .uploaded-image { display: block; max-width: 240px; max-height: 240px; object-fit: contain; margin-top: 0.5rem; }
-            #examples { padding: 1rem 1.5rem; border-top: 1px solid #e0e0e0; }
-            #examples p { font-size: 0.8rem; color: #666; margin-bottom: 0.6rem; }
-            .prompt-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-            .prompt-button {
-                background: #f6f8f5;
-                color: #28503a;
-                border: 1px solid #d9e3d9;
-                border-radius: 999px;
-                padding: 0.5rem 0.8rem;
-                text-transform: none;
-                letter-spacing: normal;
-                font-size: 0.8rem;
-            }
-            .prompt-button:hover { background: #e9f0e6; }
-            .prompt-button:focus-visible { outline: 2px solid #28503a; outline-offset: 2px; }
+            @media (prefers-reduced-motion:reduce) { #messages { scroll-behavior:auto; } }
         </style>
     </head>
     <body>
-        <div id="container">
-            <div id="messages"></div>
+        <div class="shell">
+            <header class="site-header">
+                <div><h1 class="wordmark">Styled</h1><p class="byline">by Ankita &amp; Arshnoor</p></div>
+                <nav class="header-actions" aria-label="Styling controls">
+                    <button type="button" id="new-chat" class="secondary">New chat</button>
+                    <button type="button" id="open-closet" aria-haspopup="dialog" aria-controls="closet-panel">My closet ↗</button>
+                </nav>
+            </header>
+            <main class="workspace">
+                <aside class="studio-intro" aria-label="How to use Styled">
+                    <p class="eyebrow">Your everyday styling studio</p>
+                    <h2>A fresh look.<br>Already in your closet.</h2>
+                    <p class="intro-copy">Start with a piece you love. We’ll help you wear it a new way, dress for your day, or find the missing piece.</p>
+                    <div class="wardrobe-preview" aria-hidden="true">
+                        <img src="/static/closet/reference-1.jpg" alt="" />
+                        <img src="/static/closet/reference-8.jpg" alt="" />
+                        <img src="/static/closet/reference-25.jpg" alt="" />
+                    </div>
+                    <p class="preview-caption">A few pieces from the demo closet · AI reference images</p>
             <section id="examples" aria-label="Example prompts">
-                <p>Try an idea — click to edit, then send.</p>
+                <p>A little inspiration to get started</p>
                 <div class="prompt-buttons">
+                    <button type="button" class="prompt-button" data-prompt="Plan three different outfits around my white cotton button-down shirt using my closet.">One piece, three ways</button>
+                    <button type="button" class="prompt-button" data-prompt="I’m thinking of buying another black blazer. Check whether I already own something similar before I shop.">Do I need another one?</button>
                     <button type="button" class="prompt-button" data-prompt="Put together a work outfit using items from my closet.">Style a work outfit</button>
                     <button type="button" class="prompt-button" data-prompt="Find brown jackets under 100 USD per item.">Find a jacket under $100</button>
-                    <button type="button" class="prompt-button" data-prompt="Find Pinterest inspiration for styling a long back boots for fall.">Pinterest inspiration</button>
+                    <button type="button" class="prompt-button" data-prompt="Find Pinterest inspiration for styling long black boots for fall.">Pinterest inspiration</button>
                     <button type="button" class="prompt-button" data-prompt="What should I wear from my closet for the current weather in New York?">Dress for the weather</button>
-                    <button type="button" class="prompt-button" data-prompt="Give me three different ways to style an item from my closet.">Restyle what I own</button>
+                    <button type="button" class="prompt-button" data-prompt="Help me add a new item to my closet. Ask me for the details you need.">Add a new item</button>
                     <button type="button" class="prompt-button" data-prompt="Help me create an outfit for a cartoon-character-themed party. Look through my closet first and suggest a character I can dress as using what I own. If anything is missing, find products online to complete the look.">Cartoon character party</button>
                     <button type="button" class="prompt-button" data-prompt="Find products online similar to my attached photo" data-photo="true">Shop a photo · attach image</button>
                 </div>
             </section>
+                    <p class="studio-tip">Make it yours: tell us the occasion, your city, or a budget. You can keep refining the look in the same conversation.</p>
+                </aside>
+                <section id="container" aria-label="Styling conversation">
+                    <div class="chat-header"><div><h2>Let’s find your next outfit</h2><p>Closet first. A little inspiration when you need it.</p></div><span class="session-badge">Your styling session</span></div>
+                    <div id="messages" aria-live="polite" aria-relevant="additions text">
+                        <div id="welcome"><span class="welcome-mark" aria-hidden="true">S.</span><h3>What are we dressing for?</h3><p>Pick an example, open your closet, or tell us what you have in mind.</p><div class="welcome-steps"><span>01 / Pick a piece</span><span>02 / Build a look</span><span>03 / Make it yours</span></div></div>
+                    </div>
+                    <div class="composer">
+
             <div id="input-area">
                 <input
                     type="text"
                     id="user-input"
-                    placeholder="Type a message..."
+                    placeholder="An occasion, a favorite piece, a new idea…" aria-label="Your styling request"
                     autocomplete="off"
                 />
                 <button id="send-btn">Send</button>
             </div>
             <div id="attachment-area">
-                <label for="image-input">Attach a photo</label>
+                <label for="image-input" class="attach-label">+ Attach inspiration photo</label>
                 <input type="file" id="image-input" accept="image/jpeg,image/png,image/webp" />
                 <button type="button" id="remove-image" hidden>Remove photo</button>
-                <p>JPEG, PNG or WebP, up to 5 MB. Sent to Gemini when you press Send to help find similar items.</p>
+                <p>JPEG, PNG or WebP · up to 5 MB · Sent to the stylist when you press Send.</p>
                 <img id="attachment-preview" alt="Selected outfit photo" hidden />
                 <div id="attachment-error" role="status"></div>
             </div>
+                    </div>
+                </section>
+            </main>
         </div>
+        <dialog id="closet-panel" aria-labelledby="closet-title">
+            <div class="closet-body">
+                <header class="app-header">
+                    <h2 id="closet-title">My closet</h2>
+                    <button type="button" id="close-closet" aria-label="Close closet">Close</button>
+                </header>
+                <div id="closet-scroll">
+                    <p id="closet-status" role="status"></p>
+                    <p class="product-note">AI reference images show the style. Add your own photos for an exact match.</p>
+                    <div id="closet-grid" class="products"></div>
+                </div>
+            </div>
+        </dialog>
+        <script src="/static/vendor/marked.umd.js"></script>
+        <script src="/static/vendor/purify.min.js"></script>
         <script>
             const messages = document.getElementById("messages");
             const userInput = document.getElementById("user-input");
@@ -193,8 +209,9 @@
             let imageVersion = 0;
             let imageLoading = false;
             let sessionId = null;
+            let conversationHistory = [];
 
-            document.querySelectorAll(".prompt-button").forEach(button => {
+            document.querySelectorAll("[data-prompt]").forEach(button => {
                 button.addEventListener("click", () => {
                     userInput.value = button.dataset.prompt;
                     userInput.focus();
@@ -251,7 +268,23 @@
                 }
             });
 
+            const welcomeMarkup = document.getElementById("welcome").outerHTML;
+            document.getElementById("new-chat").addEventListener("click", async () => {
+                if (sendBtn.disabled) return;
+                const previousSession = sessionId;
+                sessionId = null;
+                conversationHistory = [];
+                messages.innerHTML = welcomeMarkup;
+                userInput.value = "";
+                clearImage();
+                userInput.focus();
+                if (previousSession) {
+                    try { await fetch(`/clear?session_id=${encodeURIComponent(previousSession)}`, {method:"POST"}); } catch { /* A fresh session is still created on the next message. */ }
+                }
+            });
+
             function addMessage(role, text, isLoading = false) {
+                document.getElementById("welcome")?.remove();
                 const div = document.createElement("div");
                 div.className =
                     "msg " +
@@ -259,7 +292,7 @@
                     (isLoading ? " loading" : "");
                 const label = document.createElement("div");
                 label.className = "role";
-                label.textContent = role;
+                label.textContent = role === "assistant" ? "Your stylist" : role;
                 const content = document.createElement("div");
                 content.className = "content";
                 content.textContent = text;
@@ -267,6 +300,27 @@
                 messages.appendChild(div);
                 messages.scrollTop = messages.scrollHeight;
                 return div;
+            }
+
+            function renderAssistantText(element, text) {
+                if (!window.marked || !window.DOMPurify) {
+                    element.textContent = text;
+                    return;
+                }
+                const fragment = DOMPurify.sanitize(marked.parse(text || "", { breaks: true }), {
+                    ALLOWED_TAGS: ["p", "br", "strong", "em", "del", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "h6", "a", "blockquote", "pre", "code", "hr", "table", "thead", "tbody", "tr", "th", "td"],
+                    ALLOWED_ATTR: ["href", "title", "start"],
+                    RETURN_DOM_FRAGMENT: true,
+                });
+                fragment.querySelectorAll("a").forEach(link => {
+                    const url = safeUrl(link.getAttribute("href"));
+                    if (!url) { link.removeAttribute("href"); return; }
+                    link.href = url;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                });
+                element.classList.add("markdown");
+                element.replaceChildren(fragment);
             }
 
             function safeUrl(value) {
@@ -348,6 +402,125 @@
                 }
             }
 
+            const closetPanel = document.getElementById("closet-panel");
+            const closetGrid = document.getElementById("closet-grid");
+            const closetStatus = document.getElementById("closet-status");
+            document.getElementById("close-closet").addEventListener("click", () => closetPanel.close());
+            document.getElementById("open-closet").addEventListener("click", async () => {
+                closetPanel.showModal();
+                closetStatus.textContent = "Loading closet…";
+                closetGrid.replaceChildren();
+                try {
+                    const response = await fetch("/closet");
+                    if (!response.ok) throw new Error("Could not load your closet. Close and reopen to retry.");
+                    const data = await response.json();
+                    if (!Array.isArray(data.clothing)) throw new Error("Could not read your closet.");
+                    closetStatus.textContent = `${data.clothing.length} items`;
+                    data.clothing.forEach(item => closetGrid.append(createClosetCard(item, true)));
+                } catch (error) { closetStatus.textContent = error.message; }
+            });
+
+            function createClosetCard(item, allowUpload = false) {
+                const card = document.createElement("article");
+                card.className = "product closet-item";
+                const visual = document.createElement("div");
+                visual.className = "product-image";
+                visual.textContent = "Add a photo";
+                // Only serve wardrobe assets from our static directory; never insert HTML from tool results.
+                const path = typeof item.image_url === "string" ? item.image_url : "";
+                let url;
+                try { url = new URL(path, location.origin); } catch { url = new URL(location.origin); }
+                if (path && url.origin === location.origin && url.pathname.startsWith("/static/closet/") && /\.(?:jpe?g|png|webp)$/i.test(url.pathname)) {
+                    const img = document.createElement("img");
+                    img.alt = item.name || "Closet item";
+                    img.loading = "lazy";
+                    img.src = url.href;
+                    img.addEventListener("error", () => { visual.textContent = "Image unavailable"; });
+                    visual.replaceChildren(img);
+                }
+                const details = document.createElement("div");
+                details.className = "product-details";
+                const title = document.createElement("h3");
+                title.textContent = item.name || "Closet item";
+                const note = document.createElement("p");
+                note.className = "product-note";
+                note.textContent = item.image_kind === "photo" ? "Your photo" : item.image_kind === "ai_reference" ? "AI reference image" : "Photo not added yet";
+                details.append(title, note);
+                if (allowUpload) {
+                    const styleButton = document.createElement("button");
+                    styleButton.type = "button";
+                    styleButton.className = "prompt-button";
+                    styleButton.style.marginTop = "0.7rem";
+                    styleButton.textContent = "Style this item";
+                    styleButton.setAttribute("aria-label", `Style ${item.name}`);
+                    styleButton.addEventListener("click", () => {
+                        userInput.value = `Help me style this item: ${item.name}.`;
+                        closetPanel.close();
+                        userInput.focus();
+                    });
+                    details.append(styleButton);
+                    const label = document.createElement("label");
+                    label.className = "closet-photo-label";
+                    label.textContent = "Add your photo";
+                    const input = document.createElement("input");
+                    input.type = "file";
+                    input.accept = "image/jpeg,image/png,image/webp";
+                    input.setAttribute("aria-label", `Photo for ${item.name}`);
+                    input.addEventListener("change", async () => {
+                        const file = input.files[0];
+                        if (!file) return;
+                        if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size > 5 * 1024 * 1024) {
+                            note.textContent = "Choose JPEG, PNG or WebP under 5 MB.";
+                            return;
+                        }
+                        input.disabled = true;
+                        note.textContent = "Saving photo…";
+                        try {
+                            const image = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsDataURL(file);
+                            });
+                            const response = await fetch(`/closet/${encodeURIComponent(item.id)}/image`, {
+                                method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({image})
+                            });
+                            if (!response.ok) throw new Error("Could not save photo. Try another image.");
+                            card.replaceWith(createClosetCard(await response.json(), true));
+                        } catch (error) { note.textContent = error.message || "Could not read photo."; input.disabled = false; }
+                    });
+                    label.append(input);
+                    details.append(label);
+                }
+                card.append(visual, details);
+                return card;
+            }
+
+            function addOutfits(parent, calls) {
+                // Only render final selections, never the candidate pool from search_closet.
+                let outfits = [];
+                for (const call of calls) {
+                    if (call.name !== "present_outfits") continue;
+                    let result;
+                    try { result = JSON.parse(call.result); } catch { continue; }
+                    if (result?.status === "ok" && Array.isArray(result.outfits)) outfits = result.outfits;
+                }
+                const grid = document.createElement("div");
+                grid.className = "outfits";
+                grid.setAttribute("aria-label", "Suggested outfits");
+                for (const outfit of outfits) {
+                    if (!Array.isArray(outfit.clothing) || !outfit.clothing.length) continue;
+                    const column = document.createElement("section");
+                    column.className = "outfit";
+                    const heading = document.createElement("h3");
+                    heading.textContent = outfit.title;
+                    column.append(heading);
+                    outfit.clothing.forEach(item => column.append(createClosetCard(item)));
+                    grid.append(column);
+                }
+                if (grid.childElementCount) parent.append(grid);
+            }
+
             async function send() {
                 if (sendBtn.disabled || imageLoading) return;
                 const text = userInput.value.trim();
@@ -356,6 +529,7 @@
 
                 userInput.value = "";
                 sendBtn.disabled = true;
+                document.getElementById("new-chat").disabled = true;
                 imageInput.disabled = true;
                 removeImage.disabled = true;
                 const userMessage = addMessage("you", text || "Find similar clothing products to this photo.");
@@ -375,6 +549,7 @@
                         body: JSON.stringify({
                             message: text,
                             session_id: sessionId,
+                            history: conversationHistory,
                             image,
                         }),
                     });
@@ -385,25 +560,26 @@
                     }
                     clearImage();
                     sessionId = data.session_id;
+                    conversationHistory.push(
+                        {role:"user", content:(text || "Find similar clothing products to my uploaded photo.").slice(0,20000)},
+                        {role:"assistant", content:data.response.slice(0,20000)}
+                    );
+                    conversationHistory = conversationHistory.slice(-40);
 
-                    // Show each tool the harness ran, above the assistant's answer
+                    // Preserve every call and its exact arguments/result in an expandable trace.
                     for (const call of data.tool_calls || []) {
-                        const div = document.createElement("div");
-                        div.className = "tool";
-                        const label = document.createElement("span");
-                        label.className = "label";
-                        label.textContent = "tool call  ";
-                        div.appendChild(label);
-                        div.appendChild(
-                            document.createTextNode(
-                                call.name + "(" + JSON.stringify(call.args) + ")\n→ " + call.result,
-                            ),
-                        );
-                        messages.insertBefore(div, loading);
+                        const detail = document.createElement("details");
+                        detail.className = "tool";
+                        const summary = document.createElement("summary");
+                        summary.textContent = `Tool call · ${call.name} · expand details`;
+                        const raw = document.createElement("pre");
+                        raw.textContent = `${call.name}(${JSON.stringify(call.args, null, 2)})\n→ ${call.result}`;
+                        detail.append(summary, raw);
+                        messages.insertBefore(detail, loading);
                     }
-                    loading.querySelector(".content").textContent =
-                        data.response;
+                    renderAssistantText(loading.querySelector(".content"), data.response);
                     loading.classList.remove("loading");
+                    addOutfits(loading, data.tool_calls || []);
                     addSearchCards(loading, data.tool_calls || [], "search_products");
                     addSearchCards(loading, data.tool_calls || [], "search_pinterest_pins");
                     messages.scrollTop = messages.scrollHeight;
@@ -413,6 +589,7 @@
                     loading.classList.remove("loading");
                 }
                 sendBtn.disabled = false;
+                document.getElementById("new-chat").disabled = false;
                 imageInput.disabled = false;
                 removeImage.disabled = false;
                 userInput.focus();
