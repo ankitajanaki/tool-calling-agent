@@ -104,14 +104,14 @@ Follow-up questions stay in the same conversation while the tab is open. **New c
 
 This is a shared demo wardrobe. Additions and uploaded closet photos are saved on the running server instance, so they can reset when the hosted app restarts or moves to another instance.
 
-## For project reviewers
+## Tool Overview
 
 The app has seven tools. `get_weather`, `search_products`, and `search_pinterest_pins` request external data. `search_closet`, `add_closet_item`, and `get_closet_stats` read or update the demo wardrobe. `present_outfits` turns selected item IDs into the displayed outfit arrangements.
 
 >**Tools**
->1. `get_weather` is the tool that was presented during class that gets current temperature for a given city. Styled leverages this to suggest weather-related outfit >modifications.
+>1. `get_weather` is the tool that was presented during class that gets current temperature for a given city. Styled leverages this to suggest weather-related outfit modifications.
 >
->2. `search_products` uses SearchApi.io to look through Google Shopping. It searches for US Clothing listings, prices, retailers, images, and links. It mostly finds >similar styles, not exact matches.
+>2. `search_products` uses SearchApi.io to look through Google Shopping. It searches for US Clothing listings, prices, retailers, images, and links. It mostly finds similar styles, not exact matches.
 >
 >3. `search_pinterest_pins` leverages Google Images to find public Pinterest outfit inspiration. Pin links and images are returned.
 >
@@ -127,6 +127,7 @@ Outfit planning uses `search_closet` to find owned pieces, the model to choose c
 
 For questions about buying something similar to an owned item, the model can use `search_closet` and compare the returned pieces with the proposed purchase. It chooses which tools to use based on the request.
 
+### Tool Details and Memory
 The model chooses tools and explains the results; the Python functions do the data lookup and rule-based comparisons. The `/chat` response retains `response`, `session_id`, and `tool_calls`, with each call’s `name`, `args`, and `result`. Tool calls remain inspectable in the interface.
 
 To explore conversation memory, ask for a look with flat shoes and then say “Make it suitable for work, but keep my shoe preference.” Use **New chat** before trying a different person’s preferences.
