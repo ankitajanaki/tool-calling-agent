@@ -1,5 +1,7 @@
 # Styled by Ankita & Arshnoor
 
+Have a closet full of clothes but still feel like you have nothing to wear? Styled helps you put outfits together with what you already own. You can start with a favorite piece, dress for the weather, explore Pinterest inspiration, or look for something new to complete a look.
+
 Styled is for anyone and everyone who feels like they are constantly shopping, forgetting about pieces they own, and wearing the same outfits. Styled aims to help you love what you already own and build a wardrobe that you're excited about. Style inspiration, outfit suggestions, and finding new items are just the beginning. Below each of the key features are detailed with some examples.
 
 ## Tools
