@@ -14,7 +14,7 @@ You can be as specific as you like. Mention an occasion, a color, your city, or 
 
 Click **My closet** in the top-right corner to open a scrollable sidebar with your clothing, shoes, and accessories. This version starts with a shared demo wardrobe, so the items you see are examples rather than a separate personal closet for each visitor.
 
-![Closet](/images/my-closet.png)
+<img src = "images/my-closet.png" alt = "Closet" width = "40%" height = "50%">
 
 Find something you want to wear and click **Style this item**. The sidebar closes and adds a message like this to the text bar:
 
