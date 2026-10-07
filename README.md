@@ -4,6 +4,8 @@ Have a closet full of clothes but still feel like you have nothing to wear? Styl
 
 ## Start with a question
 
+![Overall](/images/overall.png)
+
 Open the app and type in the chat, or choose one of the example buttons in the starting panel. The buttons fill in a question for you—you can change it before pressing **Send**.
 
 You can be as specific as you like. Mention an occasion, a color, your city, or a budget if it matters. Then keep the conversation going: “Make it more relaxed,” “Use flat shoes instead,” or “Give me another option with the same shirt.”
@@ -12,9 +14,13 @@ You can be as specific as you like. Mention an occasion, a color, your city, or 
 
 Click **My closet** in the top-right corner to open a scrollable sidebar with your clothing, shoes, and accessories. This version starts with a shared demo wardrobe, so the items you see are examples rather than a separate personal closet for each visitor.
 
+![Closet](/images/my-closet.png)
+
 Find something you want to wear and click **Style this item**. The sidebar closes and adds a message like this to the text bar:
 
 > Help me style this item: White cotton button-down shirt.
+
+![Help-Me-Style](/images/help-me-style.png)
 
 Press **Send**, and the stylist will look for pieces to go with it. You can start with shoes or accessories too—it will build the outfit around whichever item you chose.
 
@@ -28,6 +34,8 @@ For example, an outfit built around the white shirt might show:
 
 If the stylist suggests another outfit, it gets its own arrangement so you can compare the looks.
 
+![Outfit-Suggestions](/images/outfit-suggestions.png)
+
 ## Wear more of what you own
 
 Try **One piece, three ways** when you want to get more use out of a favorite item. The stylist searches your closet, puts together different combinations, and displays the selected pieces for each outfit. It uses the wardrobe descriptions to help plan; you can still tell it if a pairing isn’t your style.
@@ -38,13 +46,19 @@ Before buying something, try **Do I need another one?** For example:
 
 The stylist compares the proposed item’s category, color and description with your closet and explains any possible overlap. It can help you notice a repeat purchase, while leaving the final decision to you.
 
+![Another-One](/images/another-one.png)
+
 ## Add an item or a photo
 
 Use **Add a new item** to start adding something to the wardrobe. The stylist can ask for details, or you can give them up front:
 
 > Add a burgundy cardigan to my closet. It’s a top for fall and winter, with work and layering tags.
 
+![New-Item](/images/new-item.png)
+
 Reopen **My closet** to see the new item. Choose **Add your photo** on its card to attach a picture of that garment. Closet photos are saved with the item and used in future outfit displays. The existing images labeled **AI reference image** are generated examples of the clothing, not photos of the actual garments.
+
+![New-Item-Closet](/images/new-item-closet.png)
 
 The **Attach a photo** control below the chat has a different purpose: use it to share an inspiration photo and ask for similar products. For example:
 
@@ -69,6 +83,8 @@ Shopping budgets are in USD per item. Check the linked listing for current price
 Pinterest results come from public pins, so there’s no need to connect an account. If you like a particular image, upload it in the chat or describe what you like about it to help the stylist work from that look.
 
 ## See how a suggestion was made
+
+![Tool-Calls](/images/tool-calls.png)
 
 The expandable **Tool call** rows show when the stylist checks your closet, looks up the weather, searches for products or pins, or selects pieces for an outfit. Click a row to see the full tool name, arguments, and result. This lets you see what information the stylist used.
 
